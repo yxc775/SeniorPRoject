@@ -1,0 +1,55 @@
+2.15.2019
+Lay out the foundation structure codes.
+write basic scripts for gmail notifications.
+
+2.22.2019
+Add gmail reading protocol,
+Adding GUI layout
+
+2.29.2019
+Add GUI poping mechanism, add userlist.py, add button functions
+
+3.8.2019
+Add message decoding in gmailReader.py, Add User Setting UI platform, User Setting.py
+
+3.22.2019
+
+Add Launch.py
+Add transition functions from mainmenu to userlist,
+    Edit on mainMenu.py, userlist.py
+Add transition functions from userlist to edit,
+    Edit userlist.py, addSec.py
+Add text reading from textEditbox.
+    Edit UserSetting.py
+Add Security adding UI, connect close button
+    Add addSec.py
+Add Security edit button, connect.
+    Edit addSec.py
+Add placeholder into GUI for future intergration and testing
+Setting Up Automailing System foundation
+    Add automaticMailingSystem.py
+Setting Up executable .exe for program
+    Add Launch.exe and build folder
+
+3.29.2019
+Optimize the gmailReader.py, so there are more flexibility in handling email searching and reading meachanism
+Add some foundation codes into automailing.py, the email will run and check for input and commands fews days a time and
+react to manager's email input and response to users's setting.
+
+4.05.2019
+    Optimize gmail system, test auto-mailing system, basic auto mailing and respond finished including:
+    Read Commander's message to stop server serving,
+    With given memberlist email address, read senders' info, search for sender's message and respond with corresponding texts.
+
+4.12.2019
+    Connect Database maniputation with GUI, connect add users, get users info, refresh user list,
+    next task prepared to delete users or edit users
+
+
+4.19.2019
+    Add more functions into GUI to prepare for future integration.
+    Add more functions into auto-mailing for future integration.
+    modify auto-mailing for better periodical email checking.
+
+4.26.2019
+    Add Auto Registration system, fix minor bugs in aoto-mailing system

@@ -1,0 +1,215 @@
+5/2/2019:
+Finalize: - 5 Hrs.
+	1. Fixing minor bugs in stockDB, and add a "return all user information for everyone" function.
+	2. Finalizing WeChat auto reply and report sending.
+
+4/26/2019:
+Minor changes of SQLite Wrap-up: - 2 Hrs.
+	The changes are the following:
+	1. Add a function to allow the change of user preferred analysis method. This function should supposed to be added in edit_user_info method but was forgotton last week.
+		Since edit_user_info is written in a form to minimize SQL query for performance, the insertion of method change is difficult. Therefore, a new function is written for this task.
+	2. Addressed a glitch that might allow add/edit according to user name with None middle name to cause addition failure.
+		-The reason of this glitch is that, when checking valid id or name input before calling suitable queries, in user name check, "middle name is not None" is put inside conditional statement.
+		-This will not cause an error or exception, and will not affect any operation that puts middle name inside. But when a user who does not have middle name is inserted, and the middle name variable is not empty string,
+		but None or left blank, the conditional logit will detect middle name as None, and skip the query that should suppose to run, and go to "Mistake input" print.
+		-By research, this glitch is not previously detected because the default input of middle name in each function was empty string instead of None. (Therefore, this middle name condition actually doesn't work, 
+		because it will always return true, as middle name is either empty string or with vlaue. And therefore delete it will not affect functionality). However, after the implementation of .format() None to
+		empty string last week, the middle name input is defaut to be None. And since the conditional check is before format, the check will identify middle name as None and skip the format, as well as all other query.
+		-The fix of this giltch, as mentioned, is simply delete all middle name conditional checks in every functions that may require user name input.
+
+Attempting integration and additional methods on WeChat system: - 3 Hrs.
+	Currently I am trying to achieve the following objectives of WeChat module:
+	1. WeChat is able to give auto reply by monitoring specific keyword, and then operate specifically. The auto reply is done while operations are still underway.
+		-The operations include: Help, by sending a help text. This is completed, and can be changed if other required.
+		-Unsubscribe. This is in development.
+		-Change user information. This is in development.
+		-Return current user information. This is in development.
+	2. Wechat can communicate with database. This can be expected to be done through import.
+	3. WeChat can find file. This needs works on file system.
+	4. If wechate intercepts a "report" request with date, WeChat can intercept the sender, and is able to find the report of that user and/or stock in that date, and send back to user. 
+		-The proper method is found. See comment in program.
+	5. WeChat can send file to an arbitary friend.
+		-By research, this is hampered by WeChat back end structure, and request more operations:
+			-After every login, WeChat generates a random UID for each friends or groups. Only with that UID can wechat send any message to a specific user.
+			-There are currently only two ways to receive such UID. First, by intercepting a message from that user to wechat system. This can be used in previously mentioned "send file by reply", but cannot be done actively here.
+			The second method is, after each login, find user information by its ALIAS. Since alias can be changed, this requires a specific pattern of alias logging during subscribe. AKA a new wechat account is required.
+		
+4/20/2019:
+Finishing SQLite Wrap-up: - 6 Hrs.
+	The jobs done are the following:
+	1. Finish three functions required by teammate: - 2 Hrs.
+		-The three functions are edit_user_info(), unsubscribe_share() and get_user_stock(). Details of these functions are written in in-program comments.
+	2. Change the .format() function of string input to allow all None input be casted to empty string: - 2 Hrs.
+		-The point of such change is that, non-mandatory string input (such as user.middle_name) that with None as input will have a typecasted 'None' string, which can collide with actual 'None' data.
+		-The solution is from Antonio Cuni from MIT (2010):
+		http://code.activestate.com/recipes/577227-string-formatter-that-renders-none-values-as-empty/
+		-Some problem occurs in importing this module. Therefore, the code is copied into source code as a separate class. In this way, the code runs correctly.
+		-This change have influenced number inputs (e.g: id). In this way, all number (regardless of int or float) inputs with None value will trigger exception, as None numbers are typecasted to empty string, which isn't a number.
+		-However, all id and user.gender are mandatory for input. Therefore they are not influenced.
+		-The user.prefer_method_id, though, has the choice of being empty WITH OTHER CONDITIONS. This is solved in the following.
+		-THIS CHANGE DOES NOT APPLY ON ALL STRIONGS THAT REQUIRE .format() INPUT. EITHER BECAUSE IT ONLY REQUIRES NUMBER, OR IT REQUIRES NON-EMPTY STRING.
+	3. Resolve a bug that causes empty input of prefer_method_id triggers exception: - 2 Hrs.
+		-The reason of this bug is that, in the previous version of inserting user, if prefer_method_id is left None, it will be typecasted by str(method_id) to string, while this is an id and requires number input.
+		-The modified format version, on the other hand, has the "None" empty string typecast mentioned above.
+		-The solution is, when the method table is created, insert a tuple with id=0 as "Undetermined", and change the default prefer_method_id of user from None to 0.
+	4. Change a typo on function transaction_data_table: - 10 Minutes.
+		-The typo is, the data loop delete if more than 200 accidentally uses the SPECIFIC table name created from test-use .csv file. While this works on the specific .csv, it will cause name error or even rewrite.
+		-After changing it to a generic name table, which is created in previous part of this function, it works as expected.
+
+4/13/2019:
+Commencing WeChat module Wrap-up: - 3 Hrs.
+	-A wrapper must be built to allow outer function run and manage WeChat operations. However, a difficulty is the itchat is generally built for direct run, and therefore has very limited access to class wrap-up.
+	If any instance is built , this instance can be hard to store since no parameter for initiate can be used.
+	Besides, the functions in itchat must be run in sequential orders. This adds difficulty on building a class wrapper.
+	-There is no accessible solution on reachable soruce. The current solution is, instead of building a class wrapper, everyting related to WeChat is built inside an independent function, with subfunctions managing
+	all operations, such as reply and check subscribers.
+	-Another problem exists that, by wrapping itchat methods in either function or class, the decorate @itchat.msg_register cannot find its required parameters (TEXT, etc), either in wrapped or String form.
+	The solution is, rather than directly use TEXT in direct import script, use the explicit definition itchat.content.TEXT
+	-In a moment, itchat stopped auto replying after testing, even though it had been working. The reason is the auto_login() and run() functions are moved above the msg_register to "add readibility", this hampers the functionality
+	of msg_register. By moving these functions down to the original places, the auto reply returns working.
+	-Currently the auto-reply passes the test (Despite the blockThread is temporary not added). By previous experiences, most functions will work properly if auto reply works. More additions will be commenced later.
+
+Detailing SQLite Wrap-up: - 3 Hrs.
+	-As our progresss goes into program combination, my teammate are trying to import and combine these methods in their part. I am obligied to instruct them about the use of such class, provide maintainance, 
+	and, under their request, add more methods if needed.
+	-One of the added methods is the relationship insert, which is fully supported now. Another silght modification is that, the get_user method now returns user_id as well as names.
+	-More modifications and fixes will be commenced given their request. Several given ones will be done next week.
+
+4/5/2019:
+Detailing SQLite Wrap-up: - 1 Hrs.
+	-The model of transaction table is slightly changed. A "Name" attribute is added to provide a foreign key to the exact share in stock_info table for augmented security.
+	-To avoid misclassification and incorrect lineup, all multiline comments now use 3x double quotation marks. While all multiline SQLite queries still use 3x single quotation.
+
+Create a method that allows method insert: - 1 Hr.
+	-A small problem is met that if None is input from .format() while the optional input type is string, the None will be typecasted to string and used as input. The solution is to use empty string as default empty input.
+	
+Finish transaction table creation: - 2 Hrs.
+	-The transaction table now can count the number of data inside. If the total number is greater than 200, it will delete data starting from the lowest index, until the number of data is equal to 200.
+	This is required by the calculation algorithm.
+	 
+Create is_transaction_table_match function: - 2 Hrs.
+	-This function checks if all stocks inside stock_info has a corresponding transaction table. If yes, return True. Otherwise return false.
+	A situation is met that .format works incorrectly and cannot put the right stock name into SQLite Query string. This has been addressed.
+	
+	
+3/30/2019:
+Adding methods in SQLite wrap-up: - 6 Hrs.
+	-A deletion method to delete user from database. Will be used for unsubscribe.
+	-A csv reader for reading data from stock and analysis.
+	-A function that creates separate table for transaction data of a stock (in the name of transaction_{stockname}) and insert .csv data inside.
+		-There is an unsolved situation that, if the data exists in table, inserting the exact same data in row will cause exception (instead of skipping the insertion).
+		-This is caused by insufficiently designed query language and will be fixed next week.
+		-Also, the program requires to load .csv file in different folder. This will be done later.
+
+3/22/2019:
+Wrap up the SQLite into StockDB class. - 5 Hrs.
+	-As the success of SQLite testing, it is wrapped to a python file, which allows outer call and running.
+	-SINCE TIME REMAINING IS INSUFFICIENT, AND MOST RECORDS ARE COMMENTED IN THE WRAPPED FILE, THE DETAIL LOG IS SKIPPED TEMPORARY.
+
+3/8/2019:
+Study and experiment on remote database implementation. - 4 Hrs.
+	-About database implementation, we currently plan to implement a MySQL-related database to the program for stock and user storage.
+	-However, there exists several problems on this approach. 
+	First, as a stand-alone demo, we cannot find a stable server to place the database.
+	Second, the "real" database requires external environment and setup to initialize, adding difficulties on portability (if we need this) and coding.
+	-There are two long-term choices: First, to implement MySQL server directly on the host machine (My development computer)
+	or to implement Google Cloud SQL, which solves the first problem by cloud storage, but severes the second, due to its complicated "database--cloud server--proxy--MySQL server--application" chain of implementation.
+	Also, in our current design, the daily record of shares are loaded in database as tables. The frequent creation of new tables on client-server, especially on cloud server, is relatively costly.
+	-Currently the experiment is still in progress. The Google Cloud is temporary rated over the local MySQL server approach,
+	and an experimental Google Cloud MySQL instance with connectionName: eecs395_233902:us-east4:eecs395 and public IP address: 35.245.145.47 is created
+	-However, as the situation mentioned above, the app implementation is extremely difficult, and currently hits a roadblock in connection.
+	Therefore, in the end, the implementation result may change, or even completely different in database. Although the use of SQL-ish relational database to store data used by program is guaranteed.
+	
+Implement an SQLite based local database for structure and dataframe testing. - 2 Hrs.
+	-As the situation above, the real DB implementation is pending, and we need to negotiate ASAP with dataframe structures and algorithms test. Hence, I implement an SQLite local database based on current design, and test it with data insert and query.
+	Apart from several minor "Grammar changes" (For example, the NOT NULL attributes actually can store a null string), the SQLite meets all our current requirements on a database. It also eases the table addition.
+	In this way, we also consider SQLite as a candidate of final implementation. Although using client-server is still preferred.
+	We will negotiate dataframe passing and stoarge in the future based on this implementation.
+	If we will change back to SQL database, only minor changes in program (such as ditching the Single-element tuple required by SQLite, directly pass in Stirng) are reqiured, as tested.
+Miscellaneous:
+	-Google cloud SQL can be used by pymysql library as stated. But the detail is still under construction. Moreover, Google Cloud's SDK does not support Python 3, which our program is based on.
+	-Google cloud SQL has MySQL version 5.7, whose encryption is incompatible with current MySQL 8.0+ version. Reqire think twice in either GCS implementation or MySQL reinstall with changed encryption method.
+	-Despite difficulties in Python3 implementation, Java with JDBC has a direct access on Google Cloud SQL database. Therefore, it can be considered that the database part is implemented in Java. More detail should be negotiated.
+	-By testing, if SQLite is run without re-initialize, it is going to insert the same data, causing errors. It should be handled.
+
+3/1/2019:
+Build body of WeChat auto reply function. - 3 Hrs.
+	-The WeChat auto reply function is near completion. The WeChat.py can now intercept several key words in reply (such as "help") and reply in a designed manner.
+	To be more user-friendly, the reply is designed as case-insensitive.
+	Since the length of reply (Usually more than 50 words), all of them are written in .txt file and be read by program while required.
+	A glitch is met that, whatever the message is sent to the program, it will and will only reply "Help message", which is defined in the very front, even though the message should not reply.
+	The solution is that, while calling msg_register[TEXT] for the same reaction on different strings, only one "in msg[TEXT]" is called for each group of message,
+	while the correct implementation is every string require "in msg[TEXT]", but only one function for proceeding operation is called.
+	Several side functions still require more design and construction, which will be commited later.
+	
+Reading MySQL related material, implementing MySQL remote database. - 2 Hrs.
+	-A framwork of database implementation, based on PyMySQL, is in progress, including login, logout, and query. More will be added while the library is fully understood and Windows-hosted server created.
+	More attempts of work on database is temporarily hampered by that MySQL refuses to respond on server, either CREATE TABLE or USE is not responding. This will be solved later.
+	
+
+2/22/2019:
+Design the basic structure of database, implement in MySQL. - 3 Hrs.
+	-The database basic structure is designed by Dia. Due to software limitation, the one-to-many structure cannot be shown correctly on plot, although implemented without problem.
+	Note: the one-to-many relationship exists between the following tables: method and user, user and report.
+	
+	-The basic structure of database is implemented by MySQL on a Ubuntu virtual machine with a .sql file dump. 
+	-The user table was lightly modified from the original design. The name attribute is now separated to 3 parts, respectively as first_name, middle_name, and last_name, to allow more query options.
+	-Due to the design that each stock has two unique tables, stock_data_<stock_id> and stock_analysis_<stock_id>, these two tables will be created once the stock information is present, and therefore are not implemented currently.
+	-The SQL implementation, queries, and the scripting of two tables mentioned above for each stock, will continue in the next week period.
+	-The database structure may have more minor changes in the future given experiences. The changes will be notified in README, but NOT on the Dia and .jpeg diagram.
+	
+Address a bug that causes itchat auto reply deadlocks the entire itchat process. - 3 Hrs.
+
+	Description, See README in 2/15/2019 for detail:
+	
+	-The itchat uses a message register (@itchat.msg_register) to intercept the message sent to the program and, based on defined message type, run predefined responses. To activate message register, the function itchat.run() must be called.
+	However, the default setting of itchat.run() function is a dead loop that locks the entire program.
+	According to our design, WeChat reply module is responsible for both automatic feedback with pre-defined operations (implemented by aformentioned auto-reply) and automatic report sending (implemented by other functions).
+	And therefore the auto reply must run together with other functions, rather than occupy the program entirely.
+	
+	-The first attempt is using multithreading, python threading package is implemented. However, two problems exist with threading implementation:
+	1. the itchat.run() will even block multithreading. Any operation in the other thread will be defunct.
+	2. after loaded in a thread, the itchat.run() indicates "Start auto replying" without actual reply, as mentioned in "Current test result" on 2/15/2019.
+	
+	-The current solution is by raising a flag in itchat.run() function, as itchat.run(blockThread = False), which runs auto reply without blocking program.
+	This solution is NOT DESCRIBED IN THE FORMAL API GIVEN, but found by checking forums. Hence the extra cost of time.
+	The flag blockThread = False of itchat.run() exists on the source code, but without a description, or any advise of using it.
+	The following is the source code api link. itchat.run(), as well as blockThread flag, locates at line 443:
+	https://github.com/littlecodersh/ItChat/blob/master/itchat/core.py
+	
+	-A situation raised by this solution is that without blocking thread, the program ends directly.
+	The solution to which is the addition of a program-controllable permanant loop after calling run() with flag blockThread = False.
+	
+Miscellaneous:
+	-All placeholding NULL in program were chaged to more pythonic None.
+	-Partially use Pass to replace placeholding return in functions.
+	-In design, after_login() no longer handles primary functions, as mentioned before. A new function, after_run() will handle other primary functios.
+	after_login() now serves as an auxiliary function for some post-login operations, if any is required.
+	-The placeholder of logout() is added without actual implementation.
+	
+	-The major function body, including stock data and WeChat friend interception, auto reply text, help, and report data generation, as well as minor structure improvements, will be implemented in the future if needed.
+
+2/15/2019:
+Read and commit experiments on itchat librariey. - 2 Hrs
+	-Learn itchat open-source WeChat supporting library on the website:
+	[Chinese]https://itchat.readthedocs.io/zh/latest/
+	-Learn itchat functions and coding by experimenting several open-source itchat application examples.
+Build a rough structure of stockprice WeChat communicaion interface by itchat library. - 1.5 Hrs
+Fixing a bug that conflicts itchat function call and auto-reply - 2 Hrs
+	-Itchat can intercept and register any message sent to the client by @itchat.msg_register().
+	However, to implement it, the function itchat.run() must be run first. This function seems to hang on, and therefore block all following operations.
+	Since we require itchat to send message at any time stock market fluctuates abnormally, we may require another while True loop in loginCallback (the function callbacks immediately after login). This conflicts itchat.run() function.
+	Moreover, since function in loginCallback is immediately implemented after login operation, if we use a while True loop, the itchat.run() function will never be called.
+	Currently neither the solution to this bug, nor the way to circumvent this, is found. The effort to fix this bug will continue in the next week.
+	
+	Current test result:
+	-On my personal WeChat account, itchat cannot send myself any message by using empty toUserName parameter.
+	However, by setting toUserName as 'filehelper', I can send myself any reply by filehelper, a WeChat built-in file and text communicator between different devices under the same login.
+	-itchat.run() sems to only handle auto reply. Defining an arbitary text (or any other form of reply) and sending it to myself by the aformentioned way is working.
+	-Calling itchat.run() in loginCallback called function will only result in "Start auto replying" indication without actual effect for unknown reasons.
+	Even though other itchat related functions, such as itchat.send_msg() works correctly in loginCallback called function.
+	
+	Miscellaneous:
+	-A glitch of unknown reason is found that, if hotReload flag is set True during program testing, after multiple runs and stops, the program will reply more than 1 identical messages depending on the number of runs and stops. 
+	(The correct number is supposed to be 1).
+	A solution is to temporarily disable hotReload flag during testing, and add it back True when the test is complete. At the same time, choose "quit web WeChat" from other mobile devices such as smartphone.

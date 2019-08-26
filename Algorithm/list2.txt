@@ -1,0 +1,4 @@
+MASS
+MACD
+DMI
+KDJ

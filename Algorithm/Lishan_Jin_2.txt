@@ -1,0 +1,6 @@
+
+From method MACD, 600037 has a negative situation
+From method MACD, 600704 has a negative situation
+From method MACD, 600004 has a positve situation
+From method MACD, 600008 has a negative situation
+From method MACD, 600848 has a negative situation

@@ -1,0 +1,6 @@
+
+From method KDJ, 600037 has a negative situation
+From method KDJ, 600704 has a very positve situation
+From method KDJ, 600004 has a very negative situation
+From method KDJ, 600008 has a very positve situation
+From method KDJ, 600848 has a very positve situation

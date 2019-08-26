@@ -1,0 +1,7 @@
+Welcome to Stockprice WeChat reply.
+
+A report including informations of subscribed shares will be sent in a period or as your request.
+
+You can also check the shares you subscribed and your preferred analysis algorithm.
+
+Reply "help" for help.

@@ -1,0 +1,7 @@
+Welcome to Stockprice. 
+Please reply the following text in WeChat for the corresponding information:
+
+Reply "help" for help message.
+Reply "method" to check currently preferred method.
+Reply "stock" to check currently subscribed stock.
+Reply "report" for the most current report of shares you subscribed. The report sending may take a while.

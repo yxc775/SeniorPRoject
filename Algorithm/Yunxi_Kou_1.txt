@@ -1,0 +1,6 @@
+
+From method MASS, 600037 has a negative situation
+From method MASS, 600704 has a negative situation
+From method MASS, 600004 has a very negative situation
+From method MASS, 600008 has a neutral situation
+From method MASS, 600848 has a negative situation
